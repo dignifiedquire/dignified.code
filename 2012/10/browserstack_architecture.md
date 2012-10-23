@@ -37,6 +37,7 @@ following environment variables
 BROWSERSTACK_USER = 'username'
 BROWSERSTACK_PASS = 'secretpassword'
 ```
+but you can set them to other
 
 
 
