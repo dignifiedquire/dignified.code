@@ -41,7 +41,7 @@ but you can set them to other values if you like to.
 ``` js
 browserstack = {
   username: 'user@mail.com',
-  password: 'secret
+  password: 'secret'
 };
 ```
 
