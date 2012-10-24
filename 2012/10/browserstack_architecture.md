@@ -27,19 +27,62 @@ browsers = [
  'BS::win::Firefox::15.0',
  'BS::ios::iPhone4',
  'BS::mac::Safari'
-]
+];
 ```
 So you could just add some browser prefixed with `BS::` and let the
 tests run. Now of course to use this you need credentials for loging
 in. If you don't define anything testacular will look for the
 following environment variables
-```bash
-BROWSERSTACK_USER = 'username'
-BROWSERSTACK_PASS = 'secretpassword'
+``` bash
+BROWSERSTACK_USER = 'user@mail.com'
+BROWSERSTACK_PASS = 'secret'
 ```
-but you can set them to other 
+but you can set them to other values if you like to.
+``` js
+browserstack = {
+  username: 'user@mail.com',
+  password: 'secret
+};
+```
 
+
+### The tunnel to happiness
+For BrowserStack to be able to run your tests you need to provide a
+public URL to your testsuite. This is done through a one-time tunnel. 
+I didn't lie when I wrote above that you only need to set the browsers
+and can run your tests. If there is no tunnel configuration set it
+will default to using [localtunnel][3]. But you can use your own
+tunnel command. 
+
+Let's say you have an account with [forward][4]. The first thing is
+you need to install their gem.
+``` bash
+$ gem install forward
+```
+and setup your credentials by just forwarding any test port.
+``` bash
+$ forward 8000
+Already have an account with Forward? y
+Enter your email and password
+email: user@mail.com
+password: ******
+Forwarding port 8002 at https://user.fwd.wf
+Ctrl-C to stop forwarding
+```
+Now configure testacular to use it
+``` js
+tunnel = {
+  cmd: 'forward <%= port %>'
+  timeout: 5000
+};
+```
+And finished. Testacular will start this tunnel when it needs it and
+look for a string starting with `http://` or `https://` to extract the
+url for further use. The timeout is the time in ms Testacular will give the
+command to return a url before it throws an error.
 
 
 [1]: https://github.com/vojtajina/testacular
 [2]: http://www.browserstack.com
+[3]: https://github.com/shtylman/localtunnel
+[4]: https://forwardhq.com/
