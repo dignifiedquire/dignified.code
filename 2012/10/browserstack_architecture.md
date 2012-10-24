@@ -13,9 +13,9 @@ free account setup after a few hours!
 So now I'm going to document my experience and ideas implementing this
 next step for testacular.
 
-## Part 1 - Architecture
+## Part 1 - Configuration
 
-### User Interface or "What goes into the config file?"
+### Browsers
 My first wish was that the integration should be so seamless that
 users could just use it. So I came up with the following idea
 ``` js
