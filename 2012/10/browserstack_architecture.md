@@ -87,10 +87,45 @@ command to return a url before it throws an error.
 
 ### The tunnel
 
-For the implementation of the tunnel there two external dependencies
-used. The first is [q][5] for creating
+For the implementation of the tunnel we use two external dependencies.
+The first is [q][5] for creating
 promises and second is [lodashs][6] template function for interpolation
 the command.
+
+Here is the complete code.
+``` js
+var q = require('q');
+var spawn = require('child_process').spawn;
+var _ = require('../utils')._;
+
+var create = function(cmd, port, timeout){
+  var deferred = q.defer();
+
+  var cmd = _.template(cmd, {port: port});
+  var args = [];
+  var regexp = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/;
+  var timeout = timeout || 5000;
+
+  var process = spawn(cmd, args);
+
+  setTimout(deferred.reject("No valid url found."), timeout);
+
+  process.stdout.on('data', function(data){
+    var url = data.match(regexp);
+    if(url) {
+      deferred.resolve(url[0]);
+    }
+  });
+
+  process.stderr.on('data', function(data){
+    deferred.reject(data);
+  });
+
+  return deferred.promise;
+};
+
+```
+Now lets have a closer look at what is happening.
 
 Three options get passed to the tunnel
 * `cmd` a template for the command to run
@@ -99,7 +134,7 @@ Three options get passed to the tunnel
 
 First we create a deferred object with q.
 ``` js
-  var deferred = q.defer();
+var deferred = q.defer();
 ```
 Now we setup everything we need, the command, args and a regexp to
 match a url.
@@ -135,7 +170,7 @@ process.stderr.on('data', function(data){
 ```
 And at the end we return a promise.
 ``` js
-  return deferred.promise;
+return deferred.promise;
 ```
 
 [1]: https://github.com/vojtajina/testacular
