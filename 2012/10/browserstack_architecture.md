@@ -87,11 +87,6 @@ command to return a url before it throws an error.
 
 ### The tunnel
 
-For the implementation of the tunnel we use two external dependencies.
-The first is [q][5] for creating
-promises and second is [lodashs][6] template function for interpolation
-the command.
-
 Here is the complete code.
 ``` js
 var q = require('q');
@@ -126,6 +121,12 @@ var create = function(cmd, port, timeout){
 
 ```
 Now lets have a closer look at what is happening.
+
+For the implementation of the tunnel we use two external dependencies.
+The first is [q][5] for creating
+promises and second is [lodashs][6] template function for interpolation
+the command. Also we need the internal `child_process.spawn` to run
+the command as a child process.
 
 Three options get passed to the tunnel
 * `cmd` a template for the command to run
