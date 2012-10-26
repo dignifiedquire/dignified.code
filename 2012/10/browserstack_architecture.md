@@ -44,6 +44,7 @@ browserstack = {
   password: 'secret'
 };
 ```
+As you have seen 
 
 
 ### The tunnel to happiness
@@ -82,7 +83,64 @@ url for further use. The timeout is the time in ms Testacular will give the
 command to return a url before it throws an error.
 
 
+## Part 2 - Implementation
+
+### The tunnel
+
+For the implementation of the tunnel there two external dependencies
+used. The first is [q][5] for creating
+promises and second is [lodashs][6] template function for interpolation
+the command.
+
+Three options get passed to the tunnel
+* `cmd` a template for the command to run
+* `port` the port for which a tunnel should be created
+* `timeout` in ms (defaults to 5000)
+
+First we create a deferred object with q.
+``` js
+  var deferred = q.defer();
+```
+Now we setup everything we need, the command, args and a regexp to
+match a url.
+``` js
+var cmd = _.template(cmd, {port: port});
+var args = [];
+var timeout = timeout || 5000;
+  
+var regexp = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?/;
+```
+Next the process is spawned.
+``` js
+  var process = spawn(cmd, args);
+```
+If the timeout passes reject the promise as this means
+we haven't found a valid url in time.
+``` js
+setTimout(deferred.reject("No valid url found."), timeout);
+``` 
+All data from the child process output is matched
+in search for a valid url
+``` js
+process.stdout.on('data', function(data){
+  var url = data.match(regexp);
+  if(url) {
+    deferred.resolve(url[0]);
+  }
+});
+
+process.stderr.on('data', function(data){
+  deferred.reject(data);
+});
+```
+And at the end we return a promise.
+``` js
+  return deferred.promise;
+```
+
 [1]: https://github.com/vojtajina/testacular
 [2]: http://www.browserstack.com
 [3]: https://github.com/shtylman/localtunnel
 [4]: https://forwardhq.com/
+[5]: https://github.com/kriskowal/q
+[6]: http://lodash.com/docs#template
